@@ -1,0 +1,40 @@
+{
+  "builders": [{
+   "type": "azure-arm",
+
+	"client_id": "06beb197-e9a5-403e-93e4-5de438fbe332",
+	"client_secret": "7N5~Gu0AxMdSR13-KlJ9mBFH5lxQbwMDr4",
+	"tenant_id": "c665297a-a669-447a-9b84-edca80ef32c5",
+	"subscription_id": "6b199b5c-0bc4-43be-b8f2-ff04600ca906",
+
+    "managed_image_resource_group_name": "hari-us",
+    "managed_image_name": "iris-az-packer-image",
+
+    "os_type": "Linux",
+    "image_publisher": "Canonical",
+    "image_offer": "UbuntuServer",
+    "image_sku": "18.04-LTS",
+
+    "location": "East US2",
+    "vm_size": "Standard_DS2_v2"
+  }],
+  "provisioners": [{
+    "execute_command": "chmod +x {{ .Path }}; {{ .Vars }} sudo -E sh '{{ .Path }}'",
+    "inline": [
+      "/usr/sbin/waagent -force -deprovision+user && export HISTSIZE=0 && sync",
+      "sudo apt-get update -y",
+      "sudo apt-get remove openssh-client",
+      "sudo apt-get autoclean",
+      "sudo apt-get install openssh-server",
+      "sudo apt-get install libtomcat9-java -y",
+      "sudo apt-get update -y",
+      "sudo apt-get install tomcat9-admin tomcat9-common -y",
+      "sudo apt-get install tomcat9 -y",
+      "cd /var/lib/tomcat9/webapps/",
+      "sudo wget https://hmanoh200.blob.core.windows.net/aion/aion.war",
+      "sudo systemctl start tomcat9"
+    ],
+    "inline_shebang": "/bin/sh -x",
+    "type": "shell"
+  }]
+}
